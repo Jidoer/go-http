@@ -16,7 +16,7 @@ func Test_Req(t *testing.T) {
 		"Method": {"GET", "POST"},
 		"IP":     {"127.0.0.1"},
 	}
-	headers := http.Header{"Content-Type": {"application/json"}, "Accept": {"application/json"}, "User-Agent": {"Mozilla/5566, AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.299.252 Safari/537.36"}}
+	headers := &http.Header{"Content-Type": {"application/json"}, "Accept": {"application/json"}, "User-Agent": {"Mozilla/5566, AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.299.252 Safari/537.36"}}
 	s := NewSession()
 	cookiesUrl, _ := url.Parse("http://127.0.0.1:5566/test")
 	s.CookiesJar.SetCookies(cookiesUrl, []*http.Cookie{

@@ -21,7 +21,7 @@ type Response struct {
 type Session struct {
 	httpClient *http.Client
 	CookiesJar *Jar
-	Headers    http.Header
+	Headers    *http.Header
 }
 
 func NewSession() *Session {
@@ -36,7 +36,7 @@ func (s *Session) Post(
 	//headers *http.Header,
 	body *[]byte,
 ) (resp *http.Response, err error) {
-	headers := &s.Headers
+	headers := s.Headers
 	if headers == nil {
 		headers = &http.Header{}
 		headers.Add("Content-Type", "application/x-www-form-urlencoded")
@@ -50,7 +50,7 @@ func (s *Session) Get(
 	/*
 		headers *http.Header,
 	*/) (resp *http.Response, err error) {
-	headers := &s.Headers
+	headers := s.Headers
 	return s.Request("GET", url, params, headers, nil)
 }
 
@@ -97,11 +97,16 @@ func (s *Session) Request(
 
 func (s *Session) Do(req *http.Request) (*http.Response, error) {
 	// Add session headers
-	for k := range s.Headers {
-		req.Header.Set(k, s.Headers.Get(k))
+	if s.Headers != nil {
+		for k := range *s.Headers {
+			req.Header.Set(k, s.Headers.Get(k))
+		}
 	}
-	s.httpClient.Jar = s.CookiesJar //Set Cookies
-	
+	if s.httpClient.Jar == nil {
+		s.httpClient.Jar = NewJar()
+	} else {
+		s.httpClient.Jar = s.CookiesJar //Set Cookies
+	}
 	if *Debug {
 		d, _ := httputil.DumpRequestOut(req, true)
 		log.Printf(">>>>>>>>>> REQUEST:\n%v", string(d))
